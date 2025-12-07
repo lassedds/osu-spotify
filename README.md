@@ -102,9 +102,19 @@ This will download and install:
 **Expected output:** You should see a progress bar and "added XXX packages" message.
 
 **Troubleshooting:**
+- **"vite is not recognized"** → You need to run `npm install` first!
 - If you get permission errors on Linux/Mac, don't use `sudo`. Fix npm permissions instead.
 - If installation fails, delete `node_modules` and `package-lock.json`, then try again.
 - Make sure you're in the correct directory (`osu-spotify`).
+
+**Alternative: Use the setup script:**
+```bash
+# Windows
+setup.bat
+
+# Linux/Mac
+./setup.sh
+```
 
 ### Step 4: Run in Development Mode
 
