@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { ExtractionOptions, ExtractionProgress, ExtractionConfig } from '../types';
+import { ExtractionOptions, ExtractionProgress, ExtractionConfig, BeatmapInfo } from '../types';
 
 contextBridge.exposeInMainWorld('electronAPI', {
   selectOsuFolder: (): Promise<string | null> =>
@@ -7,6 +7,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   selectOutputFolder: (): Promise<string | null> =>
     ipcRenderer.invoke('select-output-folder'),
+
+  scanBeatmaps: (osuPath: string): Promise<BeatmapInfo[]> =>
+    ipcRenderer.invoke('scan-beatmaps', osuPath),
 
   startExtraction: (options: ExtractionOptions): Promise<void> =>
     ipcRenderer.invoke('start-extraction', options),
@@ -37,6 +40,7 @@ declare global {
     electronAPI: {
       selectOsuFolder: () => Promise<string | null>;
       selectOutputFolder: () => Promise<string | null>;
+      scanBeatmaps: (osuPath: string) => Promise<BeatmapInfo[]>;
       startExtraction: (options: ExtractionOptions) => Promise<void>;
       pauseExtraction: () => Promise<void>;
       resumeExtraction: () => Promise<void>;
