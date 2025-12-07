@@ -1,6 +1,7 @@
 import { parentPort, workerData } from 'worker_threads';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as NodeID3 from 'node-id3';
 import { BeatmapParser } from '../electron/beatmapParser';
 
 interface WorkerData {
@@ -56,12 +57,39 @@ async function extractSong(
     const newAudioPath = path.join(songFolder, `audio${audioExt}`);
     await fs.promises.copyFile(audioPath, newAudioPath);
 
+    let coverImagePath: string | undefined;
     if (metadata.backgroundImage) {
       const imagePath = path.join(metadata.beatmapFolder, metadata.backgroundImage);
       if (fs.existsSync(imagePath)) {
         const imageExt = path.extname(metadata.backgroundImage);
         const newImagePath = path.join(songFolder, `cover${imageExt}`);
         await fs.promises.copyFile(imagePath, newImagePath);
+        coverImagePath = newImagePath;
+      }
+    }
+
+    if (audioExt === '.mp3') {
+      try {
+        const tags: NodeID3.Tags = {
+          title: metadata.title,
+          artist: metadata.artist,
+          album: 'osu! Songs',
+          comment: { text: `Extracted from osu! beatmap` },
+        };
+
+        if (coverImagePath) {
+          const imageBuffer = await fs.promises.readFile(coverImagePath);
+          tags.image = {
+            mime: 'image/jpeg',
+            type: { id: 3, name: 'front cover' },
+            description: 'Cover',
+            imageBuffer: imageBuffer,
+          };
+        }
+
+        NodeID3.write(tags, newAudioPath);
+      } catch (error) {
+        console.error('Failed to write ID3 tags:', error);
       }
     }
 
