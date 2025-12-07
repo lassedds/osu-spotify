@@ -85,7 +85,11 @@ export class ExtractionService {
       } else {
         const osuSongsPath = path.join(options.osuPath, 'Songs');
         if (!fs.existsSync(osuSongsPath)) {
-          throw new Error('osu! Songs folder not found');
+          throw new Error(
+            `osu! Songs folder not found at: ${osuSongsPath}\n\n` +
+            `Please ensure you have selected a valid osu! installation folder.\n` +
+            `The folder should contain a "Songs" subfolder with your beatmaps.`
+          );
         }
 
         const folders = await fs.promises.readdir(osuSongsPath);

@@ -1,5 +1,6 @@
 import { app, BrowserWindow, ipcMain, dialog } from 'electron';
 import * as path from 'path';
+import * as fs from 'fs';
 import { ExtractionService } from './extractionService';
 import { ConfigManager } from './configManager';
 import { ExtractionOptions, ExtractionProgress } from '../types';
@@ -37,13 +38,27 @@ function setupIPC() {
     const result = await dialog.showOpenDialog({
       properties: ['openDirectory'],
       title: 'Select osu! Installation Folder',
+      message: 'Select the folder where osu! is installed (should contain a "Songs" folder)',
     });
 
     if (result.canceled || result.filePaths.length === 0) {
       return null;
     }
 
-    return result.filePaths[0];
+    const selectedPath = result.filePaths[0];
+    const songsPath = path.join(selectedPath, 'Songs');
+
+    if (!fs.existsSync(songsPath)) {
+      await dialog.showMessageBox({
+        type: 'error',
+        title: 'Invalid osu! Folder',
+        message: 'The selected folder does not appear to be a valid osu! installation.',
+        detail: `Could not find a "Songs" folder in:\n${selectedPath}\n\nPlease select your osu! installation folder (e.g., C:\\osu! or C:\\Program Files\\osu!)`,
+      });
+      return null;
+    }
+
+    return selectedPath;
   });
 
   ipcMain.handle('select-output-folder', async () => {
