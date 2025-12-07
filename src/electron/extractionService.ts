@@ -1,8 +1,9 @@
 import { Worker } from 'worker_threads';
 import * as fs from 'fs';
 import * as path from 'path';
-import { ExtractionProgress, ExtractionOptions } from '../types';
+import { ExtractionProgress, ExtractionOptions, BeatmapInfo } from '../types';
 import { ConfigManager } from './configManager';
+import { BeatmapParser } from './beatmapParser';
 
 export class ExtractionService {
   private worker: Worker | null = null;
@@ -11,6 +12,7 @@ export class ExtractionService {
     totalBeatmaps: 0,
     processedBeatmaps: 0,
     extractedSongs: 0,
+    skippedSongs: 0,
     errors: [],
   };
   private configManager: ConfigManager;
@@ -31,23 +33,70 @@ export class ExtractionService {
     this.progressCallback?.(this.progress);
   }
 
+  async scanBeatmaps(osuPath: string): Promise<BeatmapInfo[]> {
+    try {
+      this.updateProgress({ status: 'scanning' });
+
+      const osuSongsPath = path.join(osuPath, 'Songs');
+      if (!fs.existsSync(osuSongsPath)) {
+        this.updateProgress({ status: 'idle' });
+        return [];
+      }
+
+      const folders = await fs.promises.readdir(osuSongsPath);
+      const beatmaps: BeatmapInfo[] = [];
+
+      for (const folder of folders) {
+        const folderPath = path.join(osuSongsPath, folder);
+        if (!fs.statSync(folderPath).isDirectory()) continue;
+
+        const metadata = await BeatmapParser.scanBeatmapFolder(folderPath);
+        if (metadata) {
+          beatmaps.push({
+            folder: folderPath,
+            artist: metadata.artist,
+            title: metadata.title,
+            audioFile: metadata.audioFilename,
+            backgroundImage: metadata.backgroundImage,
+            selected: true,
+          });
+        }
+      }
+
+      this.updateProgress({ status: 'idle' });
+      return beatmaps;
+    } catch (error) {
+      this.updateProgress({ status: 'idle' });
+      console.error('Failed to scan beatmaps:', error);
+      return [];
+    }
+  }
+
   async startExtraction(options: ExtractionOptions): Promise<void> {
     if (this.progress.status === 'running') {
       throw new Error('Extraction already in progress');
     }
 
     try {
-      const osuSongsPath = path.join(options.osuPath, 'Songs');
-      if (!fs.existsSync(osuSongsPath)) {
-        throw new Error('osu! Songs folder not found');
-      }
-
       await fs.promises.mkdir(options.outputPath, { recursive: true });
 
-      const folders = await fs.promises.readdir(osuSongsPath);
-      this.beatmapFolders = folders
-        .map(f => path.join(osuSongsPath, f))
-        .filter(f => fs.statSync(f).isDirectory());
+      if (options.selectedBeatmaps && options.selectedBeatmaps.length > 0) {
+        this.beatmapFolders = options.selectedBeatmaps;
+      } else {
+        const osuSongsPath = path.join(options.osuPath, 'Songs');
+        if (!fs.existsSync(osuSongsPath)) {
+          throw new Error('osu! Songs folder not found');
+        }
+
+        const folders = await fs.promises.readdir(osuSongsPath);
+        this.beatmapFolders = folders
+          .map(f => path.join(osuSongsPath, f))
+          .filter(f => fs.statSync(f).isDirectory());
+      }
+
+      if (options.maxBeatmaps && options.maxBeatmaps > 0) {
+        this.beatmapFolders = this.beatmapFolders.slice(0, options.maxBeatmaps);
+      }
 
       const config = await this.configManager.loadConfig();
       const extractedSongs = options.resume && config
@@ -55,7 +104,7 @@ export class ExtractionService {
         : [];
 
       await this.configManager.saveConfig({
-        osuSongsPath,
+        osuSongsPath: options.osuPath,
         outputPath: options.outputPath,
         maxFileSize: options.maxFileSizeMB,
         extractedSongs,
@@ -67,6 +116,7 @@ export class ExtractionService {
         totalBeatmaps: this.beatmapFolders.length,
         processedBeatmaps: 0,
         extractedSongs: 0,
+        skippedSongs: 0,
         errors: [],
       });
 

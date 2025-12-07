@@ -59,6 +59,15 @@ function setupIPC() {
     return result.filePaths[0];
   });
 
+  ipcMain.handle('scan-beatmaps', async (_, osuPath: string) => {
+    try {
+      return await extractionService.scanBeatmaps(osuPath);
+    } catch (error) {
+      console.error('Failed to scan beatmaps:', error);
+      return [];
+    }
+  });
+
   ipcMain.handle('start-extraction', async (_, options: ExtractionOptions) => {
     try {
       await extractionService.startExtraction(options);
