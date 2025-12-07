@@ -24,12 +24,23 @@ export interface ExtractionConfig {
 }
 
 export interface ExtractionProgress {
-  status: 'idle' | 'running' | 'paused' | 'completed' | 'error';
+  status: 'idle' | 'scanning' | 'running' | 'paused' | 'completed' | 'error';
   totalBeatmaps: number;
   processedBeatmaps: number;
   extractedSongs: number;
+  skippedSongs: number;
   currentBeatmap?: string;
+  currentArtist?: string;
   errors: string[];
+}
+
+export interface BeatmapInfo {
+  folder: string;
+  artist: string;
+  title: string;
+  audioFile: string;
+  backgroundImage?: string;
+  selected: boolean;
 }
 
 export interface ExtractionOptions {
@@ -37,11 +48,14 @@ export interface ExtractionOptions {
   outputPath: string;
   maxFileSizeMB?: number;
   resume?: boolean;
+  maxBeatmaps?: number;
+  selectedBeatmaps?: string[];
 }
 
 export type IPCChannels = {
   'select-osu-folder': () => Promise<string | null>;
   'select-output-folder': () => Promise<string | null>;
+  'scan-beatmaps': (osuPath: string) => Promise<BeatmapInfo[]>;
   'start-extraction': (options: ExtractionOptions) => Promise<void>;
   'pause-extraction': () => Promise<void>;
   'resume-extraction': () => Promise<void>;
