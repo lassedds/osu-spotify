@@ -1,7 +1,7 @@
 {
-  "name": "osu-song-extractor",
+  "name": "osu-spotify-converter",
   "version": "1.0.0",
-  "description": "Extract and organize songs from your osu! library",
+  "description": "Convert your osu! beatmap library into organized songs for Spotify and other music players",
   "main": "dist/electron/main.js",
   "scripts": {
     "dev": "concurrently \"npm run dev:react\" \"npm run dev:electron\"",
@@ -15,7 +15,7 @@
     "package:mac": "npm run build && electron-builder --mac",
     "package:linux": "npm run build && electron-builder --linux"
   },
-  "keywords": ["osu", "music", "extractor", "electron"],
+  "keywords": ["osu", "spotify", "music", "converter", "extractor", "beatmap", "electron"],
   "author": "",
   "license": "MIT",
   "devDependencies": {
@@ -35,8 +35,8 @@
     "react-dom": "^18.2.0"
   },
   "build": {
-    "appId": "com.osu.song.extractor",
-    "productName": "osu! Song Extractor",
+    "appId": "com.osu.spotify.converter",
+    "productName": "osu! to Spotify Converter",
     "files": [
       "dist/**/*",
       "node_modules/**/*",

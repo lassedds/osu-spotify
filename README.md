@@ -1,14 +1,19 @@
-# osu! Song Extractor
+# osu! to Spotify Song Extractor
 
-A modern Electron + React application for extracting and organizing songs from your osu! beatmap library.
+A modern Electron + React application that converts your osu! beatmap library into a organized music collection, perfect for importing into Spotify, iTunes, or any music library manager.
+
+## What Does This Do?
+
+If you're an osu! player, you probably have thousands of songs buried in beatmap folders with cryptic names. This app extracts those songs, organizes them with proper metadata (artist, title, cover art), and prepares them for use in your favorite music player or streaming service like Spotify's local files feature.
 
 ## Features
 
 - **Smart Extraction**: Automatically extracts audio files and cover images from osu! beatmaps
+- **Spotify-Ready Format**: Organizes songs with metadata perfect for music library import
 - **Progress Tracking**: Real-time progress updates with detailed statistics
 - **Resume Support**: Continue previous extractions without re-processing songs
-- **File Filtering**: Automatically excludes hitsounds and other non-music files
-- **Size Limits**: Set maximum file size to control extraction
+- **Hitsound Filtering**: Automatically excludes hitsounds and other non-music files
+- **Size Limits**: Set maximum file size to control extraction (skip long maps/compilations)
 - **Multi-threaded**: Uses worker threads for efficient processing without blocking the UI
 - **Memory Efficient**: Processes beatmaps in batches to avoid memory issues
 - **User-Friendly**: Clean, modern interface with pause/resume/stop controls
@@ -38,43 +43,140 @@ The application is split into modular components:
 
 - **`extractionWorker.ts`**: Background thread for file extraction
 
-## Installation
+## Installation & Setup
+
+### Prerequisites
+
+Before you begin, make sure you have the following installed:
+
+1. **Node.js 18 or higher**
+   - Download from [nodejs.org](https://nodejs.org/)
+   - Verify installation: `node --version`
+
+2. **npm** (comes with Node.js)
+   - Verify installation: `npm --version`
+
+3. **Git**
+   - Download from [git-scm.com](https://git-scm.com/)
+   - Verify installation: `git --version`
+
+4. **An osu! installation** with beatmaps in the Songs folder
+
+### Step 1: Fork the Repository (Optional)
+
+If you want to contribute or maintain your own version:
+
+1. Visit the repository on GitHub
+2. Click the "Fork" button in the top right
+3. This creates a copy under your GitHub account
+
+### Step 2: Clone the Repository
+
+**If you forked:**
+```bash
+git clone https://github.com/YOUR-USERNAME/osu-spotify.git
+cd osu-spotify
+```
+
+**If you didn't fork:**
+```bash
+git clone https://github.com/ORIGINAL-REPO/osu-spotify.git
+cd osu-spotify
+```
+
+### Step 3: Install Dependencies
+
+Install all required npm packages:
 
 ```bash
 npm install
 ```
 
-## Development
+This will download and install:
+- Electron
+- React and React DOM
+- Vite (build tool)
+- TypeScript
+- All development dependencies
 
-Run the app in development mode:
+**Expected output:** You should see a progress bar and "added XXX packages" message.
+
+**Troubleshooting:**
+- If you get permission errors on Linux/Mac, don't use `sudo`. Fix npm permissions instead.
+- If installation fails, delete `node_modules` and `package-lock.json`, then try again.
+- Make sure you're in the correct directory (`osu-spotify`).
+
+### Step 4: Run in Development Mode
+
+Start the application in development mode with hot reload:
 
 ```bash
 npm run dev
 ```
 
-This will start both the Vite dev server for React and the Electron app.
+This command does two things:
+1. Starts the Vite dev server (React frontend) on `http://localhost:5173`
+2. Launches the Electron app and connects it to the dev server
 
-## Building
+**What you should see:**
+- Terminal shows Vite server starting
+- Electron window opens with the application
+- Chrome DevTools open automatically
 
-Build the app for production:
+**First-time users:** The app will open but show empty folder paths. This is normal!
+
+### Step 5: Build for Production (Optional)
+
+If you want to create a distributable application:
+
+#### Compile the TypeScript
 
 ```bash
 npm run build
 ```
 
-Package the app for distribution:
+This compiles:
+- Electron main process code → `dist/electron/`
+- React frontend → `dist/renderer/`
+
+#### Create Platform-Specific Installers
 
 ```bash
-# For current platform
+# For your current platform
 npm run package
 
-# Platform-specific
-npm run package:win
-npm run package:mac
-npm run package:linux
+# Or specify a platform
+npm run package:win     # Windows installer (.exe)
+npm run package:mac     # macOS app (.dmg)
+npm run package:linux   # Linux AppImage
 ```
 
-Built applications will be in the `release` folder.
+**Output location:** Built applications will be in the `release/` folder.
+
+**Build requirements:**
+- Windows builds work on any platform
+- macOS builds require macOS
+- Linux builds work on any platform
+
+## Quick Start Guide
+
+### For End Users (Just Want to Use It)
+
+1. Clone the repository
+2. Run `npm install`
+3. Run `npm run dev`
+4. Select your osu! folder
+5. Select output folder
+6. Click "Start Extraction"
+
+### For Developers
+
+1. Fork and clone the repository
+2. Run `npm install`
+3. Read `SETUP.md` for development tips
+4. Make your changes
+5. Test with `npm run dev`
+6. Build with `npm run build`
 
 ## Usage
 
@@ -108,6 +210,64 @@ The `metadata.json` file contains:
 - Artist name
 - Song title
 - Original beatmap folder path
+
+## Using Extracted Songs with Spotify
+
+Once you've extracted your osu! songs, you can import them into Spotify as local files:
+
+### Windows
+
+1. **Run the extraction** to your desired output folder (e.g., `C:\Users\YourName\Music\osu-songs\`)
+
+2. **Open Spotify** → Click your profile → Settings
+
+3. **Scroll to "Local Files"** section
+
+4. **Enable** "Show Local Files"
+
+5. **Click** "Add a Source" and select your output folder
+
+6. **Wait** for Spotify to scan and index your songs
+
+7. **Find your music** in "Your Library" → "Local Files"
+
+8. **Create playlists** to sync to your phone:
+   - Create a playlist
+   - Add local files to it
+   - Download the playlist on your phone
+   - Now you can listen offline!
+
+### macOS
+
+1. **Run the extraction** to your desired output folder (e.g., `~/Music/osu-songs/`)
+
+2. **Open Spotify** → Spotify → Preferences
+
+3. **Scroll to "Local Files"**
+
+4. **Enable** "Show Local Files"
+
+5. **Click** "Add a Source" and navigate to your output folder
+
+6. **Spotify will scan** the folder and make songs available
+
+### Tips for Best Results
+
+- **Use the size limit** (e.g., 50MB) to filter out extremely long songs or compilations
+- **Enable "Resume"** if extraction gets interrupted - it will skip already-processed songs
+- **Organize output** by creating subfolders for genres or artists manually after extraction
+- **Tag cleanup**: Use a tool like [Mp3tag](https://www.mp3tag.de/) to clean up metadata if needed
+- **Duplicates**: The app uses "Artist - Title" as folder names, so duplicates are automatically handled
+
+### Alternative Music Players
+
+The extracted songs work with any music player:
+
+- **iTunes/Apple Music**: Add folder to library via File → Add to Library
+- **VLC**: Create a playlist from the output folder
+- **Windows Media Player**: Add folder to library
+- **foobar2000**: Add folder to Media Library
+- **MusicBee**: Monitor folder for automatic import
 
 ## Technical Details
 
