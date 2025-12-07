@@ -80,7 +80,7 @@ cd osu-spotify
 
 **If you didn't fork:**
 ```bash
-git clone https://github.com/ORIGINAL-REPO/osu-spotify.git
+git clone https://github.com/lassedds/osu-spotify
 cd osu-spotify
 ```
 
