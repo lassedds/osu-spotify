@@ -74,7 +74,10 @@ async function extractSong(
           title: metadata.title,
           artist: metadata.artist,
           album: 'osu! Songs',
-          comment: { text: `Extracted from osu! beatmap` },
+          comment: {
+            language: 'eng',
+            text: 'Extracted from osu! beatmap',
+          },
         };
 
         if (coverImagePath) {
