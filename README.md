@@ -297,7 +297,7 @@ The app automatically filters out common hitsound files:
 ## Project Structure
 
 ```
-osu-song-extractor/
+osu-spotify-converter/
 ├── src/
 │   ├── electron/          # Main process code
 │   │   ├── main.ts
@@ -315,10 +315,10 @@ osu-song-extractor/
 │   │   └── extractionWorker.ts
 │   └── types/             # TypeScript types
 │       └── index.ts
-├── public/                # Static files
-│   └── index.html
+├── assets/                # Application icons (optional)
 ├── dist/                  # Compiled code (generated)
 ├── release/               # Built applications (generated)
+├── index.html             # Vite entry point
 ├── package.json
 ├── tsconfig.json
 ├── tsconfig.electron.json
