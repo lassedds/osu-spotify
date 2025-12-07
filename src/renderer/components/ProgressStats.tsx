@@ -20,6 +20,10 @@ export const ProgressStats: React.FC<ProgressStatsProps> = ({ progress }) => {
         <label>Songs Extracted</label>
         <div className="value">{progress.extractedSongs.toLocaleString()}</div>
       </div>
+      <div className="stat-item">
+        <label>Skipped</label>
+        <div className="value">{progress.skippedSongs.toLocaleString()}</div>
+      </div>
     </div>
   );
 };
