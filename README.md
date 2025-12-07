@@ -124,16 +124,23 @@ Start the application in development mode with hot reload:
 npm run dev
 ```
 
-This command does two things:
-1. Starts the Vite dev server (React frontend) on `http://localhost:5173`
-2. Launches the Electron app and connects it to the dev server
+This command does three things:
+1. Compiles the Electron TypeScript code (first time only)
+2. Starts the Vite dev server (React frontend) on `http://localhost:5173`
+3. Launches the Electron app and connects it to the dev server
+4. Watches for TypeScript changes and recompiles automatically
 
 **What you should see:**
-- Terminal shows Vite server starting
+- TypeScript compilation messages
+- Vite server starting
 - Electron window opens with the application
 - Chrome DevTools open automatically
 
 **First-time users:** The app will open but show empty folder paths. This is normal!
+
+**If you get "Cannot find module dist/electron/main.js":**
+- The dev script now handles this automatically
+- If it still fails, run `npm run build:electron` manually first
 
 ### Step 5: Build for Production (Optional)
 

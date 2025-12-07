@@ -4,9 +4,10 @@
   "description": "Convert your osu! beatmap library into organized songs for Spotify and other music players",
   "main": "dist/electron/main.js",
   "scripts": {
-    "dev": "concurrently \"npm run dev:react\" \"npm run dev:electron\"",
+    "dev": "npm run build:electron && concurrently \"npm run dev:react\" \"npm run dev:electron:watch\" \"npm run dev:electron:run\"",
     "dev:react": "vite",
-    "dev:electron": "wait-on http://localhost:5173 && electron .",
+    "dev:electron:watch": "tsc -p tsconfig.electron.json --watch",
+    "dev:electron:run": "wait-on http://localhost:5173 && wait-on dist/electron/main.js && electron .",
     "build": "npm run build:react && npm run build:electron",
     "build:react": "vite build",
     "build:electron": "tsc -p tsconfig.electron.json",
